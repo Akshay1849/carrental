@@ -37,7 +37,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5173",
-            "https://carrental-bk31758vc-akshaykumargoda10-gmailcoms-projects.vercel.app"
+            "https://carrental-two-azure.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
