@@ -6,6 +6,7 @@ import api from "../services/api";
 import "../styles/Auth.css";
 
 export default function Login() {
+
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
@@ -13,6 +14,8 @@ export default function Login() {
     email: "",
     password: ""
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -30,36 +33,51 @@ export default function Login() {
     }
 
     try {
+
+      setLoading(true);
+
       const res = await api.post("/auth/login", formData);
 
       console.log("FULL RESPONSE:", res);
 
-      // backend may return { token } OR raw token
       const token = res.data.token || res.data;
 
       if (!token) {
         throw new Error("Token not received");
       }
 
-      // decode JWT
       const decoded = jwtDecode(token);
-      console.log("DECODED:", decoded);
 
-      // ✅ use context login (this updates navbar instantly)
+      console.log("DECODED TOKEN:", decoded);
+
       login(token, decoded);
 
       alert("Login Successful");
 
       navigate("/");
+
     } catch (error) {
-      console.log("ERROR:", error);
-      alert(error.response?.data || "Login Failed");
+
+      console.error("LOGIN ERROR:", error);
+
+      alert(
+        error.response?.data ||
+        error.message ||
+        "Login Failed"
+      );
+
+    } finally {
+
+      setLoading(false);
+
     }
   };
 
   return (
     <div className="auth-container">
+
       <form className="auth-form" onSubmit={handleSubmit}>
+
         <h2>Login</h2>
 
         <input
@@ -80,12 +98,16 @@ export default function Login() {
           required
         />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register</Link>
         </p>
+
       </form>
+
     </div>
   );
 }
